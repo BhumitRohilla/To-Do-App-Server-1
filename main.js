@@ -4,14 +4,19 @@ const crypto = require('crypto');
 const hostName = '127.0.0.1';
 const port = 3000;
 
-function readFile(fileName,res,callback){
-    fs.readFile(fileName,"utf8",function(err,fData){
+function readFile(fileName,res,callback,result){
+    fs.readFile(fileName,"utf8",function(err,data){
         if(!err){
-            fData = JSON.parse(fData);
+            let fData = JSON.parse(data);
             fData = callback(fData);
+            console.log(fData);
             fs.writeFile("./data.json",JSON.stringify(fData),function(){
                 res.statusCode = 200;
-                res.end();
+                if(result!=undefined){
+                    result();
+                }else{
+                    res.end();
+                }
             });
         }else{
             console.log(err);
@@ -81,6 +86,8 @@ let server = http.createServer(function(req,res){
                     return element;
                 })
                 return fileData;
+            },function(){
+                res.end();
             })
         })
     }
@@ -115,15 +122,22 @@ let server = http.createServer(function(req,res){
         req.on("end",function(){
             console.log(body);
             let data = JSON.parse(body);
-            let id = crypto.randomBytes(10).toString('hex');
+            console.log(data);
+            let id = 'a'+crypto.randomBytes(5).toString('hex');
             let obj={
                 title   :data.title,
                 id      :id,
                 statu: false
             }
+            console.log(obj);
+            let dataToReturn  = JSON.stringify(obj)
+            console.log(dataToReturn);
             readFile("./data.json",res,function(fileData){
                 fileData.push(obj);
                 return fileData;
+            },function(){
+                res.setHeader("Content-Type","application/JSON");
+                res.end(dataToReturn);
             })
         })
 

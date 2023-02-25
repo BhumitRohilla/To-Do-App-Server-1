@@ -111,15 +111,33 @@ function addElement(){
         return ;
     }
     
-    requestFromServer({title:"value"},"POST",function(request){
+    requestFromServer({title:value},"POST",function(request){
         if(request.status == 200){
+            console.log(request.responseText);
             let dataToAppend = JSON.parse(request.responseText);
+            console.log(dataToAppend);
+            list.push(dataToAppend);
+            let resultElement = makeElement(dataToAppend);
+            listContainer.appendChild(resultElement);
         }
         let dataToAppend = JSON.parse(request.responseText);
         console.log(dataToAppend);
     })
 }
 
+function checkEnter(){
+    let key = window.event.key;
+    if(key == "Enter"){
+        addElement();
+    }
+}
+
+function removeAllChar(){
+    let key = window.event.key;
+    if(key == "Enter"){
+        textArea.value = "";
+    }
+}
 
 
 function requestFromServer(data,method, callback){
@@ -139,4 +157,3 @@ function requestFromServer(data,method, callback){
         // console.log(request);
     });
 }
-
